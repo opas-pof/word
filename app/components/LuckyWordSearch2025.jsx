@@ -7,41 +7,54 @@ const LuckyWordSearch2025 = () => {
   const [selectedCells, setSelectedCells] = useState([]);
   const [direction, setDirection] = useState(null);
 
-  // หมวดตัวอย่าง (5 หมวด ๆ ละ 15 คำ - ใช้ตัวอักษร A-Z)
-  const CATEGORIES = [
+  // ระบบ Level (5 levels จากง่ายไปยาก)
+  const LEVELS = [
     {
-      name: 'สถานที่เที่ยว',
+      level: 1,
+      name: 'ระดับ 1: เริ่มต้น',
+      gridSize: 8,
+      words: ['CAT','DOG','FISH','BIRD','BEAR']
+    },
+    {
+      level: 2,
+      name: 'ระดับ 2: ง่าย',
+      gridSize: 10,
+      words: ['SUN','MOON','STAR','CLOUD','RAIN','WIND','SNOW']
+    },
+    {
+      level: 3,
+      name: 'ระดับ 3: ปานกลาง',
+      gridSize: 12,
+      words: ['APPLE','ORANGE','BANANA','GRAPE','MANGO','CHERRY','LEMON','MELON','PEACH','BERRY']
+    },
+    {
+      level: 4,
+      name: 'ระดับ 4: ยาก',
+      gridSize: 13,
+      words: ['BOOK','PEN','DESK','CHAIR','PAPER','PENCIL','ERASER','RULER','SCISSORS','GLUE','TAPE','MARKER']
+    },
+    {
+      level: 5,
+      name: 'ระดับ 5: ยากมาก',
+      gridSize: 15,
       words: ['BEACH','MOUNTAIN','ISLAND','TEMPLE','MUSEUM','PARK','DESERT','FOREST','WATERFALL','CANYON','RIVER','LAKE','CASTLE','GARDEN','CITY']
-    },
-    {
-      name: 'อาหาร',
-      words: ['PIZZA','SUSHI','BURGER','PASTA','SALAD','CURRY','STEAK','NOODLES','TACO','RAMEN','DUMPLING','SANDWICH','FRIES','SOUP','BBQ']
-    },
-    {
-      name: 'กีฬา',
-      words: ['FOOTBALL','SOCCER','BASKETBALL','TENNIS','GOLF','BASEBALL','VOLLEYBALL','SWIMMING','RUNNING','BOXING','CYCLING','SKIING','SURFING','HOCKEY','CRICKET']
-    },
-    {
-      name: 'สัตว์',
-      words: ['LION','TIGER','ELEPHANT','MONKEY','PANDA','ZEBRA','GIRAFFE','DOLPHIN','WHALE','KANGAROO','BEAR','FOX','WOLF','EAGLE','HORSE']
-    },
-    {
-      name: 'เทคโนโลยี',
-      words: ['COMPUTER','INTERNET','SMARTPHONE','ROBOTICS','DRONE','CLOUD','SERVER','DATABASE','ALGORITHM','SOFTWARE','HARDWARE','NETWORK','SENSOR','CHIPSET','MACHINE']
     }
   ];
 
-  const [categoryIndex, setCategoryIndex] = useState(0);
-  const initialWords = CATEGORIES[0].words.map(w => ({ word: w }));
+  const [currentLevel, setCurrentLevel] = useState(0);
+  const initialWords = LEVELS[0].words.map(w => ({ word: w }));
   const [words, setWords] = useState(initialWords);
+  const [gridSize, setGridSize] = useState(LEVELS[0].gridSize);
   const [startTime, setStartTime] = useState(null);
   const [totalMs, setTotalMs] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [showLevelCompleteModal, setShowLevelCompleteModal] = useState(false);
+  const [levelTime, setLevelTime] = useState(0);
+  const [levelStartTime, setLevelStartTime] = useState(null);
   const [now, setNow] = useState(0);
 
-  // Generate a 15x15 grid
-  const generateGrid = (wordsToPlace) => {
-    const size = 15;
+  // Generate a grid with dynamic size
+  const generateGrid = (wordsToPlace, size) => {
     const grid = Array(size).fill(null).map(() => Array(size).fill(''));
     const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
     
@@ -114,18 +127,21 @@ const LuckyWordSearch2025 = () => {
 
   const [grid, setGrid] = useState(null);
 
-  // เมื่อเปลี่ยนหมวด ให้รีเซ็ตคำที่พบ/การลาก และสร้างกริดใหม่
+  // เมื่อเปลี่ยน level ให้รีเซ็ตคำที่พบ/การลาก และสร้างกริดใหม่
   useEffect(() => {
-    const newWords = CATEGORIES[categoryIndex].words.map(w => ({ word: w }));
+    const level = LEVELS[currentLevel];
+    const newWords = level.words.map(w => ({ word: w }));
     setWords(newWords);
+    setGridSize(level.gridSize);
     setFoundWords([]);
     setSelectedCells([]);
     setDirection(null);
-    setGrid(generateGrid(newWords));
-    if (categoryIndex === 0 && !startTime) {
+    setGrid(generateGrid(newWords, level.gridSize));
+    setLevelStartTime(Date.now());
+    if (currentLevel === 0 && !startTime) {
       setStartTime(Date.now());
     }
-  }, [categoryIndex]);
+  }, [currentLevel]);
 
   // อัปเดตตัวนับเวลาแบบเรียลไทม์หลังเริ่มเกม และหยุดเมื่อจบทุกหมวด
   useEffect(() => {
@@ -144,10 +160,14 @@ const LuckyWordSearch2025 = () => {
     if (found && !foundWords.includes(found.word)) {
       const next = [...foundWords, found.word];
       setFoundWords(next);
-      // ถ้าพบครบทั้งหมวด
+      // ถ้าพบครบทั้ง level
       if (next.length === words.length) {
-        if (categoryIndex + 1 < CATEGORIES.length) {
-          setCategoryIndex(categoryIndex + 1);
+        const levelEndTime = Date.now();
+        const timeSpent = levelStartTime ? levelEndTime - levelStartTime : 0;
+        setLevelTime(timeSpent);
+        
+        if (currentLevel + 1 < LEVELS.length) {
+          setShowLevelCompleteModal(true);
         } else {
           const end = Date.now();
           setTotalMs(startTime ? end - startTime : 0);
@@ -329,6 +349,11 @@ const LuckyWordSearch2025 = () => {
     window.location.reload();
   };
 
+  const handleNextLevel = () => {
+    setShowLevelCompleteModal(false);
+    setCurrentLevel(currentLevel + 1);
+  };
+
   const progress = (foundWords.length / words.length) * 100;
 
   const formatMs = (ms) => {
@@ -354,16 +379,16 @@ const LuckyWordSearch2025 = () => {
             </div>
             <div className="bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 rounded-2xl px-4 md:px-6 py-2 md:py-3 transform rotate-1 hover:rotate-0 transition-transform">
               <p className="text-lg md:text-2xl font-bold text-white">
-                โหมดเล่นเป็นหมวด: หมวดละ 15 คำ • รวม 5 หมวด
+                ระบบ 5 ระดับ • เริ่มง่าย ยากขึ้นเรื่อยๆ
               </p>
             </div>
           </div>
         </div>
 
-        {/* Progress Bar + Timer + Stepper */}
+        {/* Progress Bar + Timer + Level Stepper */}
         <div className="bg-white/90 backdrop-blur rounded-2xl p-3 md:p-4 mb-3 md:mb-4 shadow-lg">
           <div className="flex items-center justify-between flex-wrap gap-3 mb-2">
-            <span className="text-sm md:text-base font-bold text-gray-700">หมวด {categoryIndex + 1}/{CATEGORIES.length}: {CATEGORIES[categoryIndex].name}</span>
+            <span className="text-sm md:text-base font-bold text-gray-700">{LEVELS[currentLevel].name} ({gridSize}×{gridSize})</span>
             <div className="flex items-center gap-2">
               <span className="text-xl">⏱️</span>
               <span className="text-lg md:text-xl font-extrabold text-purple-700">{formatMs(elapsedMs)}</span>
@@ -379,12 +404,12 @@ const LuckyWordSearch2025 = () => {
             </div>
           </div>
           <div className="mt-3 flex items-center gap-2 flex-wrap">
-            {CATEGORIES.map((c, idx) => (
-              <div key={c.name} className={`w-8 h-8 md:w-9 md:h-9 rounded-full flex items-center justify-center text-sm md:text-base font-bold 
-                ${idx < categoryIndex ? 'bg-green-500 text-white' : idx === categoryIndex ? 'bg-purple-600 text-white animate-pulse' : 'bg-gray-200 text-gray-500'}`}
-                title={`${idx + 1}. ${c.name}`}
+            {LEVELS.map((lv, idx) => (
+              <div key={lv.level} className={`w-8 h-8 md:w-9 md:h-9 rounded-full flex items-center justify-center text-sm md:text-base font-bold 
+                ${idx < currentLevel ? 'bg-green-500 text-white' : idx === currentLevel ? 'bg-purple-600 text-white animate-pulse' : 'bg-gray-200 text-gray-500'}`}
+                title={`${lv.name} (${lv.gridSize}×${lv.gridSize})`}
               >
-                {idx < categoryIndex ? '✓' : idx + 1}
+                {idx < currentLevel ? '✓' : lv.level}
               </div>
             ))}
           </div>
@@ -393,7 +418,7 @@ const LuckyWordSearch2025 = () => {
         {/* Instructions */}
         <div className="bg-white/90 backdrop-blur rounded-2xl p-3 md:p-4 mb-3 md:mb-4 shadow-lg">
           <p className="text-center text-gray-700 font-medium text-sm md:text-base mb-2">
-            🎯 คลิกตัวอักษรทีละตัวเพื่อสะกดคำ ให้ครบ 15 คำต่อหมวด แล้วไปหมวดถัดไป
+            🎯 คลิกตัวอักษรทีละตัวเพื่อสะกดคำ • ผ่านแต่ละ Level เพื่อปลดล็อค Level ถัดไป
           </p>
           <p className="text-center text-purple-600 font-bold text-xs md:text-sm">
             💡 ระบบล็อคทิศทางอัตโนมัติหลังเลือกตัวที่ 2 • คลิกตามลำดับในทิศทางเดียวกัน • กด ✓ เพื่อยืนยัน
@@ -406,7 +431,7 @@ const LuckyWordSearch2025 = () => {
             <div className="bg-white/95 backdrop-blur rounded-3xl p-3 md:p-6 shadow-2xl">
               <div 
                 className="grid gap-1 md:gap-2 mx-auto"
-                style={{ gridTemplateColumns: `repeat(15, minmax(0, 1fr))` }}
+                style={{ gridTemplateColumns: `repeat(${gridSize}, minmax(0, 1fr))` }}
               >
                 {grid
                   ? grid.map((row, rowIndex) => (
@@ -443,7 +468,7 @@ const LuckyWordSearch2025 = () => {
                         );
                       })
                     ))
-                  : Array.from({ length: 15 * 15 }).map((_, i) => (
+                  : Array.from({ length: gridSize * gridSize }).map((_, i) => (
                       <div
                         key={`skeleton-${i}`}
                         className="aspect-square rounded bg-gray-100 animate-pulse"
@@ -486,7 +511,7 @@ const LuckyWordSearch2025 = () => {
           <div className="lg:col-span-1">
             <div className="bg-white/95 backdrop-blur rounded-2xl p-4 md:p-6 shadow-lg sticky top-4">
               <h2 className="text-xl md:text-2xl font-bold text-gray-800 mb-4 text-center">
-                🎊 คำในหมวดนี้
+                🎊 คำใน Level นี้
               </h2>
               <div className="space-y-2 max-h-[600px] overflow-y-auto">
                 {[...words].sort((a, b) => a.word.localeCompare(b.word)).map(({ word }) => (
@@ -529,18 +554,73 @@ const LuckyWordSearch2025 = () => {
         </div>
       </div>
       
-      {/* Modal แสดงเวลารวมเมื่อเคลียร์ครบทุกหมวด */}
+      {/* Modal แสดงเมื่อผ่านแต่ละ Level */}
+      {showLevelCompleteModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-3xl p-6 md:p-8 max-w-md w-[90%] text-center shadow-2xl border-4 border-purple-300">
+            <div className="text-6xl mb-4 animate-bounce">🎊</div>
+            <h3 className="text-3xl font-bold mb-3 text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600">
+              ยินดีด้วย!
+            </h3>
+            <div className="bg-white rounded-2xl p-4 mb-4 shadow-inner">
+              <p className="text-xl font-bold text-gray-800 mb-2">
+                ผ่าน {LEVELS[currentLevel].name}
+              </p>
+              <p className="text-sm text-gray-600 mb-1">เวลาที่ใช้ในด่านนี้</p>
+              <div className="text-4xl font-extrabold text-purple-600">{formatMs(levelTime)}</div>
+            </div>
+            <div className="flex gap-3 items-center justify-center mb-4">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-gray-700">{foundWords.length}</div>
+                <div className="text-xs text-gray-500">คำที่พบ</div>
+              </div>
+              <div className="text-3xl">→</div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-purple-600">Level {currentLevel + 2}</div>
+                <div className="text-xs text-gray-500">ด่านถัดไป</div>
+              </div>
+            </div>
+            <button
+              onClick={handleNextLevel}
+              className="w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white px-6 py-4 rounded-2xl font-bold text-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all flex items-center justify-center gap-2"
+            >
+              <span className="text-2xl">🚀</span>
+              ไปด่านถัดไป
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Modal แสดงเวลารวมเมื่อเคลียร์ครบทุก Level */}
       {showModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white rounded-3xl p-6 md:p-8 max-w-md w-[90%] text-center shadow-2xl">
-            <div className="text-4xl mb-3">🎉</div>
-            <h3 className="text-2xl font-bold mb-2 text-gray-800">ยินดีด้วย!</h3>
-            <p className="text-gray-700 mb-4">คุณผ่านครบทุก {CATEGORIES.length} หมวด</p>
-            <div className="text-5xl font-extrabold text-purple-600 mb-4">{formatMs(totalMs || 0)}</div>
+          <div className="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-3xl p-6 md:p-8 max-w-md w-[90%] text-center shadow-2xl border-4 border-yellow-400">
+            <div className="text-6xl mb-4 animate-bounce">🏆</div>
+            <h3 className="text-3xl font-bold mb-3 text-transparent bg-clip-text bg-gradient-to-r from-yellow-600 to-orange-600">
+              ยอดเยี่ยม!
+            </h3>
+            <div className="bg-white rounded-2xl p-4 mb-4 shadow-inner">
+              <p className="text-xl font-bold text-gray-800 mb-2">
+                คุณผ่านครบทั้ง {LEVELS.length} ระดับแล้ว!
+              </p>
+              <p className="text-sm text-gray-600 mb-1">เวลาที่ใช้ทั้งหมด</p>
+              <div className="text-5xl font-extrabold text-orange-600 mb-2">{formatMs(totalMs || 0)}</div>
+              <div className="flex gap-4 justify-center text-center mt-4">
+                <div>
+                  <div className="text-2xl font-bold text-purple-600">{LEVELS.reduce((sum, lv) => sum + lv.words.length, 0)}</div>
+                  <div className="text-xs text-gray-500">คำทั้งหมด</div>
+                </div>
+                <div>
+                  <div className="text-2xl font-bold text-green-600">{LEVELS.length}</div>
+                  <div className="text-xs text-gray-500">ระดับ</div>
+                </div>
+              </div>
+            </div>
             <button
               onClick={resetGame}
-              className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-3 rounded-full font-bold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
+              className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-4 rounded-2xl font-bold text-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all flex items-center justify-center gap-2"
             >
+              <span className="text-2xl">🔄</span>
               เล่นใหม่อีกครั้ง
             </button>
           </div>
