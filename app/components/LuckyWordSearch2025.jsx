@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 const LuckyWordSearch2025 = () => {
   const [foundWords, setFoundWords] = useState([]);
   const [selectedCells, setSelectedCells] = useState([]);
-  const [isSelecting, setIsSelecting] = useState(false);
+  const [direction, setDirection] = useState(null);
 
   // หมวดตัวอย่าง (5 หมวด ๆ ละ 15 คำ - ใช้ตัวอักษร A-Z)
   const CATEGORIES = [
@@ -120,6 +120,7 @@ const LuckyWordSearch2025 = () => {
     setWords(newWords);
     setFoundWords([]);
     setSelectedCells([]);
+    setDirection(null);
     setGrid(generateGrid(newWords));
     if (categoryIndex === 0 && !startTime) {
       setStartTime(Date.now());
@@ -158,14 +159,6 @@ const LuckyWordSearch2025 = () => {
     return false;
   };
 
-  const [direction, setDirection] = useState(null);
-
-  const handleCellMouseDown = (row, col) => {
-    setIsSelecting(true);
-    setSelectedCells([[row, col]]);
-    setDirection(null);
-  };
-
   const getDirection = (r1, c1, r2, c2) => {
     const dr = r2 - r1;
     const dc = c2 - c1;
@@ -200,47 +193,79 @@ const LuckyWordSearch2025 = () => {
            (diffC > 0 ? 1 : -1) === dc;
   };
 
-  const handleCellMouseEnter = (row, col) => {
-    if (isSelecting && selectedCells.length > 0) {
-      const last = selectedCells[selectedCells.length - 1];
-      
-      if (last[0] === row && last[1] === col) return;
-      
-      const first = selectedCells[0];
-      
-      if (selectedCells.length === 1) {
-        const newDir = getDirection(first[0], first[1], row, col);
-        if (newDir) {
-          setDirection(newDir);
+  const handleCellClick = (row, col) => {
+    if (selectedCells.length === 0) {
+      setSelectedCells([[row, col]]);
+      setDirection(null);
+      return;
+    }
+
+    const alreadySelected = selectedCells.some(([r, c]) => r === row && c === col);
+    if (alreadySelected) {
+      return;
+    }
+
+    const first = selectedCells[0];
+
+    if (selectedCells.length === 1) {
+      const newDir = getDirection(first[0], first[1], row, col);
+      if (newDir) {
+        setDirection(newDir);
+        setSelectedCells([...selectedCells, [row, col]]);
+      }
+    } else if (direction) {
+      if (isInLine(first[0], first[1], row, col, direction)) {
+        const expectedR = first[0] + direction[0] * selectedCells.length;
+        const expectedC = first[1] + direction[1] * selectedCells.length;
+        
+        if (expectedR === row && expectedC === col) {
           setSelectedCells([...selectedCells, [row, col]]);
-        }
-      } else if (direction) {
-        if (isInLine(first[0], first[1], row, col, direction)) {
-          const alreadySelected = selectedCells.some(([r, c]) => r === row && c === col);
-          if (!alreadySelected) {
-            const expectedR = first[0] + direction[0] * selectedCells.length;
-            const expectedC = first[1] + direction[1] * selectedCells.length;
-            
-            if (expectedR === row && expectedC === col) {
-              setSelectedCells([...selectedCells, [row, col]]);
-            }
-          }
         }
       }
     }
   };
 
-  const handleMouseUp = () => {
-    if (isSelecting && selectedCells.length > 0) {
+  const handleSubmit = () => {
+    if (selectedCells.length > 0) {
       checkWord(selectedCells);
       setSelectedCells([]);
+      setDirection(null);
     }
-    setIsSelecting(false);
+  };
+
+  const handleClear = () => {
+    setSelectedCells([]);
     setDirection(null);
   };
 
   const isSelected = (row, col) => {
     return selectedCells.some(([r, c]) => r === row && c === col);
+  };
+
+  const getSelectedIndex = (row, col) => {
+    const index = selectedCells.findIndex(([r, c]) => r === row && c === col);
+    return index >= 0 ? index + 1 : null;
+  };
+
+  const isNextPossible = (row, col) => {
+    if (selectedCells.length === 0) return false;
+    if (isSelected(row, col)) return false;
+    if (isInFoundWord(row, col)) return false;
+    
+    const first = selectedCells[0];
+    
+    if (selectedCells.length === 1) {
+      const dir = getDirection(first[0], first[1], row, col);
+      return dir !== null;
+    }
+    
+    if (direction) {
+      const expectedR = first[0] + direction[0] * selectedCells.length;
+      const expectedC = first[1] + direction[1] * selectedCells.length;
+      return expectedR === row && expectedC === col;
+    }
+    
+    return false;
   };
 
   const isInFoundWord = (row, col) => {
@@ -368,10 +393,10 @@ const LuckyWordSearch2025 = () => {
         {/* Instructions */}
         <div className="bg-white/90 backdrop-blur rounded-2xl p-3 md:p-4 mb-3 md:mb-4 shadow-lg">
           <p className="text-center text-gray-700 font-medium text-sm md:text-base mb-2">
-            🎯 ลากเมาส์ผ่านตัวอักษรเพื่อสะกดคำให้ครบ 15 คำต่อหมวด แล้วไปหมวดถัดไป
+            🎯 คลิกตัวอักษรทีละตัวเพื่อสะกดคำ ให้ครบ 15 คำต่อหมวด แล้วไปหมวดถัดไป
           </p>
           <p className="text-center text-purple-600 font-bold text-xs md:text-sm">
-            💡 ระบบจะล็อคทิศทางอัตโนมัติหลังเลือกตัวที่ 2 - ลากเฉียงได้ง่ายขึ้น!
+            💡 ระบบล็อคทิศทางอัตโนมัติหลังเลือกตัวที่ 2 • คลิกตามลำดับในทิศทางเดียวกัน • กด ✓ เพื่อยืนยัน
           </p>
         </div>
 
@@ -382,50 +407,41 @@ const LuckyWordSearch2025 = () => {
               <div 
                 className="grid gap-1 md:gap-2 mx-auto"
                 style={{ gridTemplateColumns: `repeat(15, minmax(0, 1fr))` }}
-                onMouseUp={handleMouseUp}
-                onMouseLeave={handleMouseUp}
               >
                 {grid
                   ? grid.map((row, rowIndex) => (
-                      row.map((cell, colIndex) => (
-                        <div
-                          key={`${rowIndex}-${colIndex}`}
-                          className={`
-                            aspect-square flex items-center justify-center 
-                            text-sm md:text-base font-bold rounded-md md:rounded-lg cursor-pointer
-                            transition-all duration-200 select-none
-                            min-h-[28px] md:min-h-[32px]
-                            ${isSelected(rowIndex, colIndex) 
-                              ? 'bg-yellow-400 text-purple-900 scale-110 shadow-lg z-10 ring-2 ring-yellow-500' 
-                              : isInFoundWord(rowIndex, colIndex)
-                              ? 'bg-gradient-to-br from-green-300 to-emerald-400 text-green-900'
-                              : 'bg-gray-50 text-gray-700 hover:bg-purple-100 active:bg-purple-200'
-                            }
-                          `}
-                          onMouseDown={() => handleCellMouseDown(rowIndex, colIndex)}
-                          onMouseEnter={() => handleCellMouseEnter(rowIndex, colIndex)}
-                          onTouchStart={(e) => {
-                            e.preventDefault();
-                            handleCellMouseDown(rowIndex, colIndex);
-                          }}
-                          onTouchMove={(e) => {
-                            e.preventDefault();
-                            const touch = e.touches[0];
-                            const element = document.elementFromPoint(touch.clientX, touch.clientY);
-                            if (element && element.dataset.row && element.dataset.col) {
-                              handleCellMouseEnter(parseInt(element.dataset.row), parseInt(element.dataset.col));
-                            }
-                          }}
-                          onTouchEnd={(e) => {
-                            e.preventDefault();
-                            handleMouseUp();
-                          }}
-                          data-row={rowIndex}
-                          data-col={colIndex}
-                        >
-                          {cell}
-                        </div>
-                      ))
+                      row.map((cell, colIndex) => {
+                        const selectedIdx = getSelectedIndex(rowIndex, colIndex);
+                        const isNext = isNextPossible(rowIndex, colIndex);
+                        
+                        return (
+                          <div
+                            key={`${rowIndex}-${colIndex}`}
+                            className={`
+                              aspect-square flex items-center justify-center relative
+                              text-sm md:text-base font-bold rounded-md md:rounded-lg cursor-pointer
+                              transition-all duration-200 select-none
+                              min-h-[28px] md:min-h-[32px]
+                              ${isSelected(rowIndex, colIndex) 
+                                ? 'bg-yellow-400 text-purple-900 scale-110 shadow-lg z-10 ring-2 ring-yellow-500' 
+                                : isNext
+                                ? 'bg-blue-200 text-blue-900 ring-2 ring-blue-400 animate-pulse'
+                                : isInFoundWord(rowIndex, colIndex)
+                                ? 'bg-gradient-to-br from-green-300 to-emerald-400 text-green-900'
+                                : 'bg-gray-50 text-gray-700 hover:bg-purple-100 active:bg-purple-200'
+                              }
+                            `}
+                            onClick={() => handleCellClick(rowIndex, colIndex)}
+                          >
+                            {cell}
+                            {selectedIdx && (
+                              <span className="absolute -top-1 -right-1 bg-purple-600 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold">
+                                {selectedIdx}
+                              </span>
+                            )}
+                          </div>
+                        );
+                      })
                     ))
                   : Array.from({ length: 15 * 15 }).map((_, i) => (
                       <div
@@ -434,6 +450,35 @@ const LuckyWordSearch2025 = () => {
                       />
                     ))}
               </div>
+              
+              {selectedCells.length > 0 && (
+                <div className="mt-4 flex flex-col gap-3">
+                  <div className="bg-purple-100 rounded-xl p-3 text-center">
+                    <p className="text-sm font-bold text-purple-800 mb-1">
+                      คำที่เลือก: {selectedCells.map(([r, c]) => grid[r][c]).join('')}
+                    </p>
+                    <p className="text-xs text-purple-600">
+                      ({selectedCells.length} ตัวอักษร)
+                    </p>
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={handleSubmit}
+                      className="flex-1 bg-gradient-to-r from-green-500 to-emerald-600 text-white px-4 py-3 rounded-xl font-bold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all flex items-center justify-center gap-2"
+                    >
+                      <span className="text-xl">✓</span>
+                      ยืนยันคำ
+                    </button>
+                    <button
+                      onClick={handleClear}
+                      className="flex-1 bg-gradient-to-r from-red-500 to-pink-600 text-white px-4 py-3 rounded-xl font-bold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all flex items-center justify-center gap-2"
+                    >
+                      <span className="text-xl">✕</span>
+                      ยกเลิก
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
@@ -443,7 +488,7 @@ const LuckyWordSearch2025 = () => {
               <h2 className="text-xl md:text-2xl font-bold text-gray-800 mb-4 text-center">
                 🎊 คำในหมวดนี้
               </h2>
-              <div className="space-y-2 max-h-96 overflow-y-auto">
+              <div className="space-y-2 max-h-[600px] overflow-y-auto">
                 {[...words].sort((a, b) => a.word.localeCompare(b.word)).map(({ word }) => (
                   <div
                     key={word}
