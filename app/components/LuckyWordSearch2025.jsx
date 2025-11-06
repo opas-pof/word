@@ -158,16 +158,74 @@ const LuckyWordSearch2025 = () => {
     return false;
   };
 
+  const [direction, setDirection] = useState(null);
+
   const handleCellMouseDown = (row, col) => {
     setIsSelecting(true);
     setSelectedCells([[row, col]]);
+    setDirection(null);
+  };
+
+  const getDirection = (r1, c1, r2, c2) => {
+    const dr = r2 - r1;
+    const dc = c2 - c1;
+    
+    if (dr === 0 && dc === 0) return null;
+    
+    const absDr = Math.abs(dr);
+    const absDc = Math.abs(dc);
+    
+    if (absDr === 0) return [0, dc > 0 ? 1 : -1];
+    if (absDc === 0) return [dr > 0 ? 1 : -1, 0];
+    if (absDr === absDc) return [dr > 0 ? 1 : -1, dc > 0 ? 1 : -1];
+    
+    return null;
+  };
+
+  const isInLine = (r1, c1, r2, c2, dir) => {
+    if (!dir) return false;
+    const [dr, dc] = dir;
+    if (dr === 0 && dc === 0) return false;
+    
+    const diffR = r2 - r1;
+    const diffC = c2 - c1;
+    
+    if (dr === 0) return diffR === 0;
+    if (dc === 0) return diffC === 0;
+    
+    if (diffR === 0 || diffC === 0) return false;
+    
+    return Math.abs(diffR) === Math.abs(diffC) && 
+           (diffR > 0 ? 1 : -1) === dr && 
+           (diffC > 0 ? 1 : -1) === dc;
   };
 
   const handleCellMouseEnter = (row, col) => {
-    if (isSelecting) {
+    if (isSelecting && selectedCells.length > 0) {
       const last = selectedCells[selectedCells.length - 1];
-      if (!last || last[0] !== row || last[1] !== col) {
-        setSelectedCells([...selectedCells, [row, col]]);
+      
+      if (last[0] === row && last[1] === col) return;
+      
+      const first = selectedCells[0];
+      
+      if (selectedCells.length === 1) {
+        const newDir = getDirection(first[0], first[1], row, col);
+        if (newDir) {
+          setDirection(newDir);
+          setSelectedCells([...selectedCells, [row, col]]);
+        }
+      } else if (direction) {
+        if (isInLine(first[0], first[1], row, col, direction)) {
+          const alreadySelected = selectedCells.some(([r, c]) => r === row && c === col);
+          if (!alreadySelected) {
+            const expectedR = first[0] + direction[0] * selectedCells.length;
+            const expectedC = first[1] + direction[1] * selectedCells.length;
+            
+            if (expectedR === row && expectedC === col) {
+              setSelectedCells([...selectedCells, [row, col]]);
+            }
+          }
+        }
       }
     }
   };
@@ -178,6 +236,7 @@ const LuckyWordSearch2025 = () => {
       setSelectedCells([]);
     }
     setIsSelecting(false);
+    setDirection(null);
   };
 
   const isSelected = (row, col) => {
@@ -308,8 +367,11 @@ const LuckyWordSearch2025 = () => {
 
         {/* Instructions */}
         <div className="bg-white/90 backdrop-blur rounded-2xl p-3 md:p-4 mb-3 md:mb-4 shadow-lg">
-          <p className="text-center text-gray-700 font-medium text-sm md:text-base">
+          <p className="text-center text-gray-700 font-medium text-sm md:text-base mb-2">
             🎯 ลากเมาส์ผ่านตัวอักษรเพื่อสะกดคำให้ครบ 15 คำต่อหมวด แล้วไปหมวดถัดไป
+          </p>
+          <p className="text-center text-purple-600 font-bold text-xs md:text-sm">
+            💡 ระบบจะล็อคทิศทางอัตโนมัติหลังเลือกตัวที่ 2 - ลากเฉียงได้ง่ายขึ้น!
           </p>
         </div>
 
@@ -318,7 +380,7 @@ const LuckyWordSearch2025 = () => {
           <div className="lg:col-span-2">
             <div className="bg-white/95 backdrop-blur rounded-3xl p-3 md:p-6 shadow-2xl">
               <div 
-                className="grid gap-0.5 md:gap-1 mx-auto"
+                className="grid gap-1 md:gap-2 mx-auto"
                 style={{ gridTemplateColumns: `repeat(15, minmax(0, 1fr))` }}
                 onMouseUp={handleMouseUp}
                 onMouseLeave={handleMouseUp}
@@ -330,17 +392,36 @@ const LuckyWordSearch2025 = () => {
                           key={`${rowIndex}-${colIndex}`}
                           className={`
                             aspect-square flex items-center justify-center 
-                            text-xs md:text-base font-bold rounded cursor-pointer
+                            text-sm md:text-base font-bold rounded-md md:rounded-lg cursor-pointer
                             transition-all duration-200 select-none
+                            min-h-[28px] md:min-h-[32px]
                             ${isSelected(rowIndex, colIndex) 
-                              ? 'bg-yellow-400 text-purple-900 scale-110 shadow-lg z-10' 
+                              ? 'bg-yellow-400 text-purple-900 scale-110 shadow-lg z-10 ring-2 ring-yellow-500' 
                               : isInFoundWord(rowIndex, colIndex)
                               ? 'bg-gradient-to-br from-green-300 to-emerald-400 text-green-900'
-                              : 'bg-gray-50 text-gray-700 hover:bg-purple-100'
+                              : 'bg-gray-50 text-gray-700 hover:bg-purple-100 active:bg-purple-200'
                             }
                           `}
                           onMouseDown={() => handleCellMouseDown(rowIndex, colIndex)}
                           onMouseEnter={() => handleCellMouseEnter(rowIndex, colIndex)}
+                          onTouchStart={(e) => {
+                            e.preventDefault();
+                            handleCellMouseDown(rowIndex, colIndex);
+                          }}
+                          onTouchMove={(e) => {
+                            e.preventDefault();
+                            const touch = e.touches[0];
+                            const element = document.elementFromPoint(touch.clientX, touch.clientY);
+                            if (element && element.dataset.row && element.dataset.col) {
+                              handleCellMouseEnter(parseInt(element.dataset.row), parseInt(element.dataset.col));
+                            }
+                          }}
+                          onTouchEnd={(e) => {
+                            e.preventDefault();
+                            handleMouseUp();
+                          }}
+                          data-row={rowIndex}
+                          data-col={colIndex}
                         >
                           {cell}
                         </div>
