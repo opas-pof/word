@@ -365,70 +365,26 @@ const LuckyWordSearch2025 = () => {
   const elapsedMs = startTime ? (showModal ? (totalMs || 0) : (now && now > startTime ? now - startTime : 0)) : 0;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-400 via-pink-300 to-yellow-300 p-2 md:p-6">
+    <div className="min-h-screen p-2 md:p-6">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="text-center mb-4 md:mb-6">
-          <div className="inline-block bg-white rounded-3xl px-4 md:px-8 py-4 md:py-6 shadow-2xl transform -rotate-1 hover:rotate-0 transition-transform">
-            <div className="flex items-center justify-center gap-2 md:gap-3 mb-2">
-              <span className="text-3xl md:text-5xl">🍀</span>
-              <h1 className="text-2xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500">
-                Lucky Word Search
-              </h1>
-              <span className="text-3xl md:text-5xl">✨</span>
-            </div>
-            <div className="bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 rounded-2xl px-4 md:px-6 py-2 md:py-3 transform rotate-1 hover:rotate-0 transition-transform">
-              <p className="text-lg md:text-2xl font-bold text-white">
-                ระบบ 5 ระดับ • เริ่มง่าย ยากขึ้นเรื่อยๆ
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Progress Bar + Timer + Level Stepper */}
-        <div className="bg-white/90 backdrop-blur rounded-2xl p-3 md:p-4 mb-3 md:mb-4 shadow-lg">
-          <div className="flex items-center justify-between flex-wrap gap-3 mb-2">
-            <span className="text-sm md:text-base font-bold text-gray-700">{LEVELS[currentLevel].name} ({gridSize}×{gridSize})</span>
-            <div className="flex items-center gap-2">
-              <span className="text-xl">⏱️</span>
-              <span className="text-lg md:text-xl font-extrabold text-purple-700">{formatMs(elapsedMs)}</span>
-            </div>
-            <span className="text-sm md:text-base font-bold text-purple-600">{foundWords.length}/{words.length}</span>
-          </div>
-          <div className="w-full bg-gray-200 rounded-full h-3 md:h-4">
-            <div 
-              className="bg-gradient-to-r from-purple-500 to-pink-500 h-3 md:h-4 rounded-full transition-all duration-500 flex items-center justify-end pr-2"
-              style={{ width: `${progress}%` }}
-            >
-              {progress > 10 && <span className="text-xs text-white font-bold">{Math.round(progress)}%</span>}
-            </div>
-          </div>
-          <div className="mt-3 flex items-center gap-2 flex-wrap">
-            {LEVELS.map((lv, idx) => (
-              <div key={lv.level} className={`w-8 h-8 md:w-9 md:h-9 rounded-full flex items-center justify-center text-sm md:text-base font-bold 
-                ${idx < currentLevel ? 'bg-green-500 text-white' : idx === currentLevel ? 'bg-purple-600 text-white animate-pulse' : 'bg-gray-200 text-gray-500'}`}
-                title={`${lv.name} (${lv.gridSize}×${lv.gridSize})`}
-              >
-                {idx < currentLevel ? '✓' : lv.level}
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Instructions */}
-        <div className="bg-white/90 backdrop-blur rounded-2xl p-3 md:p-4 mb-3 md:mb-4 shadow-lg">
-          <p className="text-center text-gray-700 font-medium text-sm md:text-base mb-2">
-            🎯 คลิกตัวอักษรทีละตัวเพื่อสะกดคำ • ผ่านแต่ละ Level เพื่อปลดล็อค Level ถัดไป
-          </p>
-          <p className="text-center text-purple-600 font-bold text-xs md:text-sm">
-            💡 ระบบล็อคทิศทางอัตโนมัติหลังเลือกตัวที่ 2 • คลิกตามลำดับในทิศทางเดียวกัน • กด ✓ เพื่อยืนยัน
-          </p>
-        </div>
+          <h1 className="text-2xl md:text-5xl font-bold text-white py-4">
+            เกมค้นหาคำ 2025
+          </h1>
+          <h2 className="text-lg md:text-xl text-white">
+            เล่นเกมค้นหาคำ 2025 ง่ายๆ ค้นหาคำศัพท์ที่ซ่อนอยู่ในตารางตามลำดับที่กำหนด
+          </h2>
+        </div>       
 
         <div className="grid lg:grid-cols-3 gap-4 md:gap-6">
           {/* Word Grid */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2">            
             <div className="bg-white/95 backdrop-blur rounded-3xl p-3 md:p-6 shadow-2xl">
+              <p className="text-center text-gray-700 font-medium text-sm md:text-base mb-2">
+                🎯 เริ่มต้นด้วยการคลิกตัวอักษรตัวแรกที่คุณต้องการ จากนั้นคลิกตัวอักษรตัวที่สองเพื่อกำหนดทิศทาง หลังจากนั้นระบบจะล็อคทิศทางให้อัตโนมัติ คุณสามารถคลิกตัวอักษรถัดไปตามทิศทางนั้นได้เรื่อยๆ เมื่อสะกดคำเสร็จแล้ว ให้กดปุ่ม ✓ เพื่อยืนยันคำนั้น เมื่อคุณผ่าน Level ปัจจุบันแล้ว คุณจะสามารถเล่น Level ถัดไปได้
+              </p>
+
               <div 
                 className="grid gap-1 md:gap-2 mx-auto"
                 style={{ gridTemplateColumns: `repeat(${gridSize}, minmax(0, 1fr))` }}
@@ -509,6 +465,35 @@ const LuckyWordSearch2025 = () => {
 
           {/* Word List Sidebar */}
           <div className="lg:col-span-1">
+            {/* Progress Bar + Timer + Level Stepper */}
+            <div className="bg-white/90 backdrop-blur rounded-2xl p-3 md:p-4 mb-3 md:mb-4 shadow-lg">
+              <div className="flex items-center justify-between flex-wrap gap-3 mb-2">
+                <span className="text-sm md:text-base font-bold text-gray-700">{LEVELS[currentLevel].name} </span>
+                <div className="flex items-center gap-2">
+                  <span className="text-xl">⏱️</span>
+                  <span className="text-lg md:text-xl font-extrabold text-purple-700">{formatMs(elapsedMs)}</span>
+                </div>                
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-3 md:h-4">
+                <div 
+                  className="bg-gradient-to-r from-purple-500 to-pink-500 h-3 md:h-4 rounded-full transition-all duration-500 flex items-center justify-end pr-2"
+                  style={{ width: `${progress}%` }}
+                >
+                  {progress > 10 && <span className="text-xs text-white font-bold">{Math.round(progress)}%</span>}
+                </div>
+              </div>
+              <div className="mt-3 flex items-center gap-2 flex-wrap">
+                {LEVELS.map((lv, idx) => (
+                  <div key={lv.level} className={`w-8 h-8 md:w-9 md:h-9 rounded-full flex items-center justify-center text-sm md:text-base font-bold 
+                    ${idx < currentLevel ? 'bg-green-500 text-white' : idx === currentLevel ? 'bg-purple-600 text-white animate-pulse' : 'bg-gray-200 text-gray-500'}`}
+                    title={`${lv.name} (${lv.gridSize}×${lv.gridSize})`}
+                  >
+                    {idx < currentLevel ? '✓' : lv.level}
+                  </div>
+                ))}
+              </div>
+            </div>
+
             <div className="bg-white/95 backdrop-blur rounded-2xl p-4 md:p-6 shadow-lg sticky top-4">
               <h2 className="text-xl md:text-2xl font-bold text-gray-800 mb-4 text-center">
                 🎊 คำใน Level นี้
@@ -540,18 +525,11 @@ const LuckyWordSearch2025 = () => {
             className="bg-gradient-to-r from-orange-500 to-red-600 text-white px-6 md:px-8 py-3 md:py-4 rounded-full font-bold text-base md:text-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all flex items-center justify-center gap-2"
           >
             <span className="text-xl md:text-2xl">🔄</span>
-            New Game
+            เริ่มเกมใหม่
           </button>
         </div>
 
-        {/* Footer */}
-        <div className="text-center mt-6 md:mt-8">
-          <div className="inline-block bg-white/80 backdrop-blur rounded-2xl px-4 md:px-6 py-3 md:py-4 shadow-lg">
-            <p className="text-xs md:text-sm text-gray-600 font-medium">
-              ✨ Lucky Word Search 2025 • Find your fortune daily! 🍀
-            </p>
-          </div>
-        </div>
+        
       </div>
       
       {/* Modal แสดงเมื่อผ่านแต่ละ Level */}
