@@ -377,6 +377,62 @@ const LuckyWordSearch2025 = () => {
           </h2>
         </div>       
 
+        {/* Progress Bar + Timer - Mobile: Top */}
+        <div className="lg:hidden mb-4">
+          <div className="bg-white/90 backdrop-blur rounded-2xl p-3 shadow-lg">
+            <div className="flex items-center justify-between flex-wrap gap-3 mb-2">
+              <span className="text-sm font-bold text-gray-700">{LEVELS[currentLevel].name} </span>
+              <div className="flex items-center gap-2">
+                <span className="text-xl">⏱️</span>
+                <span className="text-lg font-extrabold text-purple-700">{formatMs(elapsedMs)}</span>
+              </div>                
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-3">
+              <div 
+                className="bg-gradient-to-r from-purple-500 to-pink-500 h-3 rounded-full transition-all duration-500 flex items-center justify-end pr-2"
+                style={{ width: `${progress}%` }}
+              >
+                {progress > 10 && <span className="text-xs text-white font-bold">{Math.round(progress)}%</span>}
+              </div>
+            </div>
+            <div className="mt-3 flex items-center gap-2 flex-wrap">
+              {LEVELS.map((lv, idx) => (
+                <div key={lv.level} className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold 
+                  ${idx < currentLevel ? 'bg-green-500 text-white' : idx === currentLevel ? 'bg-purple-600 text-white animate-pulse' : 'bg-gray-200 text-gray-500'}`}
+                  title={`${lv.name} (${lv.gridSize}×${lv.gridSize})`}
+                >
+                  {idx < currentLevel ? '✓' : lv.level}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Word List - Mobile: After Progress, Before Game */}
+        <div className="lg:hidden mb-4">
+          <div className="bg-white/95 backdrop-blur rounded-2xl p-4 shadow-lg">
+            <h2 className="text-xl font-bold text-gray-800 mb-4 text-center">
+              🎊 คำใน Level นี้
+            </h2>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              {[...words].sort((a, b) => a.word.localeCompare(b.word)).map(({ word }) => (
+                <div
+                  key={word}
+                  className={`
+                    rounded-xl p-2 text-center font-bold transition-all duration-300 text-sm
+                    ${foundWords.includes(word)
+                      ? 'bg-gradient-to-r from-green-400 to-emerald-500 text-white scale-105 shadow-lg'
+                      : 'bg-gray-100 text-gray-400'
+                    }
+                  `}
+                >
+                  {word}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
         <div className="grid lg:grid-cols-3 gap-4 md:gap-6">
           {/* Word Grid */}
           <div className="lg:col-span-2">            
@@ -463,8 +519,8 @@ const LuckyWordSearch2025 = () => {
             </div>
           </div>
 
-          {/* Word List Sidebar */}
-          <div className="lg:col-span-1">
+          {/* Desktop Sidebar */}
+          <div className="hidden lg:block lg:col-span-1">
             {/* Progress Bar + Timer + Level Stepper */}
             <div className="bg-white/90 backdrop-blur rounded-2xl p-3 md:p-4 mb-3 md:mb-4 shadow-lg">
               <div className="flex items-center justify-between flex-wrap gap-3 mb-2">

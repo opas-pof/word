@@ -1,6 +1,7 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
 import Script from "next/script";
+import Navigation from "./components/Navigation";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -54,33 +55,20 @@ export default function RootLayout({ children }) {
             gtag('config', 'G-DBZBLF8EQ4');
           `}
         </Script>
-      <header className="w-full bg-[#3ec9b0] text-white relative">
-          <div className="container mx-auto">
-            <div className="h-16 flex items-center gap-4">
-              <Link href="/" className="inline-flex items-center">
-                <img src="https://my.kapook.com/img-portal/logo-kapook.png" alt="Kapook" className="h-[53px] w-[168px]" />
+        <header className="w-full bg-[#3ec9b0] text-white relative">
+          <div className="container mx-auto px-2 sm:px-4 md:px-6">
+            <div className="h-12 sm:h-14 md:h-16 flex items-center gap-2 sm:gap-3 md:gap-4 pl-12 sm:pl-0">
+              <Link href="/" className="inline-flex items-center flex-shrink-0">
+                <img src="https://my.kapook.com/img-portal/logo-kapook.png" alt="Kapook" className="h-10 w-auto sm:h-10 md:h-[53px] md:w-[168px]" />
               </Link>
-              <div className="flex items-center ml-4">
-                <strong className="text-3xl font-semibold text-white">Word Search</strong>
+              <div className="flex items-center ml-1 sm:ml-2 md:ml-4">
+                <strong className="hidden sm:block text-base sm:text-xl md:text-2xl lg:text-3xl font-semibold text-white whitespace-nowrap">Word Search</strong>
               </div>
             </div>
           </div>
-          <div id="truehits_div" className="absolute top-2 right-4"></div>
+          <div id="truehits_div" className="absolute top-1 right-1 sm:top-2 sm:right-2 md:top-2 md:right-4"></div>
         </header>
-        <div className="nav w-full h-[45px]">
-          <nav className="container h-full">
-            <ul>
-              <li className="active"><a href="/">หน้าแรก</a></li>
-              <li><a href="/2568">ดูดวง 2568</a></li>
-              <li><a href="/horo_daily.php">ดูดวงรายวัน</a></li>
-              <li><a href="/horo_love.php">ดูดวงความรัก</a></li>
-              <li><a href="/tarot.php">ดูดวงไพ่ยิปซี</a></li>
-              <li><a href="/horo_birthday.php">ดูดวงวันเดือนปีเกิด</a></li>
-              <li><a href="/fortuneteller">เช็กดวงกับหมอดัง</a></li>
-              <li><a href="/dream">ทำนายฝัน</a></li>
-            </ul>
-          </nav>
-        </div>
+        <Navigation />
         {children}
       </body>
     </html>

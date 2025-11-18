@@ -13,32 +13,52 @@ h1, h2, h3, h4, h5, h6 {
   font-family: "Noto Serif Thai", "Sarabun", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans";
 }
 
-.container { width:1200px; margin:0 auto; }
+.container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 1rem; }
+  @media (min-width: 640px) {
+    .container { padding: 0 1.5rem; }
+  }
+  @media (min-width: 1024px) {
+    .container { padding: 0 2rem; }
+  }
+  
   /* เมนูแนวเดิมจาก src/index.css */
   .nav { width: 100%; box-sizing: border-box; background: #24b197; position: relative; }
   .nav ul { margin: 0 auto; box-sizing: border-box; }
   .nav ul:after { display: block; content: ""; clear: both; }
-  .nav ul>li { display: inline; float: left; text-align: center; min-width: 100px; position: relative; }
+  
+  /* Mobile: ซ่อน navigation แบบเดิม (ใช้ drawer แทน) */
+  @media (max-width: 639px) {
+    .nav { display: none; }
+  }
+  
+  /* Desktop: ใช้ float แบบเดิม */
+  @media (min-width: 640px) {
+    .nav ul>li { display: inline; float: left; text-align: center; min-width: 100px; position: relative; }
+    .nav ul>li>a { color: #FFF; display: block; font-size: 18px; margin-top: 5px; padding: 0 11px; height: 40px; line-height: 36px; box-sizing: border-box; position: relative; }
+    .nav ul>li>a:before { content:""; display:inline; float:left; margin: 0 2px 0 0; width:30px; height:40px; background:url(//my.kapook.com/svg-portal/ico-horoscope.svg) 0 0 no-repeat; background-size:24px;}
+    .nav ul>li:first-child>a:before { background-position: 0 0}
+    .nav ul>li:nth-child(2)>a:before { background-position: 0 -40px}
+    .nav ul>li:nth-child(3)>a:before { background-position: 0 -80px}
+    .nav ul>li:nth-child(4)>a:before { background-position: 0 -120px}
+    .nav ul>li:nth-child(5)>a:before { background-position: 0 -160px}
+    .nav ul>li:nth-child(6)>a:before { background-position: 0 -200px}
+    .nav ul>li:nth-child(7)>a:before { background-position: 0 -240px}
+    .nav ul>li:nth-child(8)>a:before { background-position: 0 -280px}
+    .nav ul>li:nth-child(9)>a:before { background-position: 0 -320px}
+    .nav ul>li:nth-child(10)>a:before { background-position: 0 -360px}
+    .nav ul>li:nth-child(11)>a:before { background-position: 0 -400px}
+    .nav ul>li:nth-child(12)>a:before { background-position: 0 -440px}
+    .nav ul>li:nth-child(13)>a:before { background-position: 0 -480px}
+  }
+  
   .nav ul>li:last-child { min-width: auto; }
   .nav ul>li strong { font-weight: normal; }
-  .nav ul>li>a { color: #FFF; display: block; font-size: 18px; margin-top: 5px; padding: 0 11px; height: 40px; line-height: 36px; box-sizing: border-box; position: relative; }
   .nav ul>li>a:hover { background: rgba(255,255,255,1); color: #000; }
-  .nav ul>li.active>a { background: #FFF; color: #000; line-height: 40px; }
+  .nav ul>li.active>a { background: #FFF; color: #000; }
+  @media (min-width: 640px) {
+    .nav ul>li.active>a { line-height: 40px; }
+  }
   .nav ul.list-top-menu>li:hover>a { background: #FFF; color: #000; line-height: 40px; }
-  .nav ul>li.active:after { border-bottom: 3px solid #fe0000; content: ""; position: absolute; display: block; width: 80%; left: 50%; transform: translateX(-50%) }
+  .nav ul>li.active:after { border-bottom: 3px solid #fe0000; content: ""; position: absolute; display: block; width: 80%; left: 50%; transform: translateX(-50%); bottom: 0; }
   .nav ul>li.moresub>a:hover { background: transparent; }
-  .nav ul>li>a:before { content:""; display:inline; float:left; margin: 0 2px 0 0; width:30px; height:40px; background:url(//my.kapook.com/svg-portal/ico-horoscope.svg) 0 0 no-repeat; background-size:24px;}
   .nav ul>li.active>a:before, .nav ul>li:hover>a:before { background:url(//my.kapook.com/svg-portal/ico-horoscope2.svg) #FFF 0 0 no-repeat; background-size:24px;}
-  .nav ul>li:first-child>a:before { background-position: 0 0}
-  .nav ul>li:nth-child(2)>a:before { background-position: 0 -40px}
-  .nav ul>li:nth-child(3)>a:before { background-position: 0 -80px}
-  .nav ul>li:nth-child(4)>a:before { background-position: 0 -120px}
-  .nav ul>li:nth-child(5)>a:before { background-position: 0 -160px}
-  .nav ul>li:nth-child(6)>a:before { background-position: 0 -200px}
-  .nav ul>li:nth-child(7)>a:before { background-position: 0 -240px}
-  .nav ul>li:nth-child(8)>a:before { background-position: 0 -280px}
-  .nav ul>li:nth-child(9)>a:before { background-position: 0 -320px}
-  .nav ul>li:nth-child(10)>a:before { background-position: 0 -360px}
-  .nav ul>li:nth-child(11)>a:before { background-position: 0 -400px}
-  .nav ul>li:nth-child(12)>a:before { background-position: 0 -440px}
-  .nav ul>li:nth-child(13)>a:before { background-position: 0 -480px}
