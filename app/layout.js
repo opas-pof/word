@@ -22,6 +22,13 @@ export const metadata = {
     title: "เกมค้นหาคำ 2025 - Word Search Game",
     description: "เล่นเกมค้นหาคำ 2025 ง่ายๆ ค้นหาคำศัพท์ที่ซ่อนอยู่ในตาราง",
     type: "website",
+    url: "https://kapook.com",
+    siteName: "Kapook",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "เกมค้นหาคำ 2025 - Word Search Game",
+    description: "เล่นเกมค้นหาคำ 2025 ง่ายๆ ค้นหาคำศัพท์ที่ซ่อนอยู่ในตาราง",
   },
 };
 
