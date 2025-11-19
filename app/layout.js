@@ -69,7 +69,7 @@ export default function RootLayout({ children }) {
                 <img src="https://my.kapook.com/img-portal/logo-kapook.png" alt="Kapook" className="h-10 w-auto sm:h-10 md:h-[53px] md:w-[168px]" />
               </Link>
               <div className="flex items-center ml-1 sm:ml-2 md:ml-4">
-                <strong className="hidden sm:block text-base sm:text-xl md:text-2xl lg:text-3xl font-semibold text-white whitespace-nowrap">Word Search</strong>
+                <strong className="hidden sm:block text-base sm:text-xl md:text-2xl lg:text-3xl font-semibold text-white whitespace-nowrap">GAME</strong>
               </div>
             </div>
           </div>

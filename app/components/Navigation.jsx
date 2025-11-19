@@ -26,14 +26,12 @@ const Navigation = () => {
   };
 
   const menuItems = [
-    { href: '/', label: 'หน้าแรก', active: true },
-    { href: '/2568', label: 'ดูดวง 2568' },
-    { href: '/horo_daily.php', label: 'ดูดวงรายวัน' },
-    { href: '/horo_love.php', label: 'ดูดวงความรัก' },
-    { href: '/tarot.php', label: 'ดูดวงไพ่ยิปซี' },
-    { href: '/horo_birthday.php', label: 'ดูดวงวันเดือนปีเกิด' },
-    { href: '/fortuneteller', label: 'เช็กดวงกับหมอดัง' },
-    { href: '/dream', label: 'ทำนายฝัน' },
+    { href: '/', label: 'หน้าแรก Game' },
+    { href: '/news', label: 'ข่าวเกม' },
+    { href: '/newgame', label: 'เกมใหม่' },
+    { href: '/gaminggear', label: 'เกมมิ่งเกียร์' },
+    { href: '/tips', label: 'เรื่องน่ารู้เกมมิ่ง' },
+    { href: '/e-sports', label: 'E-Sports' },
   ];
 
   return (
